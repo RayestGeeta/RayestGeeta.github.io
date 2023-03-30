@@ -16,13 +16,73 @@ math: true
 - 当然预估概率存在偏差是常见的，比如在推荐大多数场景中，不需要关注预估概率与真实的偏差，只用来排序。但是仍有一些场景需要做预估校准：
   - 广告点击排序：广告点击率预估实际上是保证用户体验，推出用户可能感兴趣的，但平台需要考虑推送广告的收益，通常排序公式为$pctr^\alpha * bid^\beta$，这个时候就需要考虑`pctr`的真实概率。
   - 电商排序：和广告排序很类似，如果只用`pctcvr`排序会出现一个问题，往往推给用户的都是低价商品，但电商场景中`GMV`是很重要的。通常电商场景排序公式为$pctcvr^\alpha * price^\beta$
+
+
 ### 1.2 保序回归
 
 
 ## 2. __工业界保序回归做法__
+
+- 构造数据
+  - 模拟比较真实的电商数据，共100
+  
+  ```python
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from matplotlib.collections import LineCollection
+  from sklearn.linear_model import LinearRegression
+  from sklearn.isotonic import IsotonicRegression
+  from sklearn.utils import check_random_state
+
+  n = 100000
+
+  model_predict = np.random.random(n)
+  model_predict.sort()
+
+  p = np.linspace(0.01, 0.2, n)
+  order_label = np.random.binomial(1, p)
+  ```
+
 - 分桶
 - PVA
+  - sklearn直接调用：
+  - 具体代码实现(参考):
+  ```python
+  def isotonic_regression(x, y):
+      n = len(x)  # 样本数量
+      p = [0] * n  # 输出预测值
+      
+      # 对x排序
+      indices = list(range(n))
+      indices.sort(key=lambda i: x[i])
+      
+      # 初始化y_mean为y的累计和，方便后续均值求解
+      y_mean = [y[indices[0]]]
+      for i in range(1, n):
+          y_mean.append(y_mean[-1] + y[indices[i]])
+          
+      # 计算分段平均值
+      breakpoints = []
+      for i in range(n):
+          if (i == 0 or x[indices[i]] > x[indices[i - 1]]):
+              slope = y_mean[i] / (i + 1)
+              breakpoints.append(slope)
+      
+      # 对每个输入x，计算对应的保序回归值
+      k = len(breakpoints)
+      for i in range(n):
+          j = 0
+          while j < k and x[indices[i]] >= x[indices[j]]:
+              j += 1
+          p[indices[i]] = breakpoints[j - 1]
+          
+      return p
+  ```
 - 线性插值
-```python
-import pandas as pd
-```
+
+
+## 3. __存在的问题__
+
+
+## 参考文档
+[稀疏CTR离线化分桶](https://zhuanlan.zhihu.com/p/450221388)
