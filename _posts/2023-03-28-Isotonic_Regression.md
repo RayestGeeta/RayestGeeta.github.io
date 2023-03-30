@@ -86,3 +86,7 @@ math: true
 
 ## 参考文档
 [稀疏CTR离线化分桶](https://zhuanlan.zhihu.com/p/450221388)
+
+[使用 Isotonic Regression 校准分类器](http://vividfree.github.io/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2015/12/21/classifier-calibration-with-isotonic-regression)
+
+[Calibrating User Response Predictions in Online Advertising](/assets/files/sub_214.pdf)
