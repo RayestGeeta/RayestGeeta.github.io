@@ -44,8 +44,27 @@ math: true
   ```
 
 - 分桶
+  ```python
+  # 分桶前分数预处理：
+  def func(x):
+      return np.log10(1+1000*x)/3
+      
+  rankData['new_score'] = func(rankData['rankscore'].values)
+  rankData.sort_values(by = ['new_score'], na_position='first', inplace=True)
+  N_bucket = 4000
+
+  bins = [i/N_bucket for i in range(int(N_bucket + 1 - 1000))] + [i/N_bucket for i in range(int(N_bucket + 1 - 1000), N_bucket+1, 2)]
+
+  bucket_res = pd.cut(low_rankData['new_score'].values, bins=bins)
+  low_rankData['bucket'] = bucket_res.codes
+  low_groupData = low_rankData.groupby('bucket').agg(['mean','count'])
+  ```
 - PVA
   - sklearn直接调用：
+  ```python
+  ir = IsotonicRegression()
+  high_y_ = ir.fit_transform(high_groupData.index, high_groupData['orderLabel']['mean'])
+  ```
   - 具体代码实现(参考):
   ```python
   def isotonic_regression(x, y):
@@ -79,6 +98,49 @@ math: true
       return p
   ```
 - 线性插值
+  ```python
+  # 高价权重生成
+  def sir_weight(p1, p2 ,r1, r2):
+      a = (r2-r1)/(p2-p1)
+      b = r1 - a*p1
+      return a, b
+
+  N_bucket = 3000
+  bins = [i/N_bucket for i in range(int(N_bucket + 1 - 1000))] + [i/N_bucket for i in range(int(N_bucket + 1 - 1000), N_bucket+1, 2)]
+  high_bin_nums = len(bins) - 1
+
+  high_bucket_weight_bias = {}
+
+  bin_bucket, high_weight, high_bias = [], [], []
+
+  flag = True
+  for i in range(len(high_groupData)-1):
+      bucket_i = high_groupData.index[i]
+      bucket_i_1 = high_groupData.index[i+1]
+      
+      pi = bins[bucket_i]
+      pi_1 = bins[bucket_i_1]
+      
+      ri = high_y_[i]
+      ri_1 = high_y_[i+1]
+      
+      weight, bias = sir_weight(pi, pi_1, ri, ri_1)
+      
+      if flag and weight != 0.0:
+          for i in range(bucket_i):
+              high_bucket_weight_bias[i] = [weight, bias]
+          flag = False
+
+
+      for i in range(bucket_i, bucket_i_1):
+          high_bucket_weight_bias[i] = [weight, bias]
+
+              
+  last_bucket = high_groupData.index[-1]
+  for i in range(last_bucket, high_bin_nums+100):
+      high_bucket_weight_bias[i] = high_bucket_weight_bias[i-1]
+      
+  ```
 
 
 ## 3. __存在的问题__
