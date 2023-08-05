@@ -19,3 +19,4 @@ math: true
 
 
 ## 3. 第二站(ChinaJoy)
+![scene1](/img/IMG_20230729_161121.jpg){: _w="370" h="200" .normal}
