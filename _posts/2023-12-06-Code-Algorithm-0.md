@@ -1,5 +1,5 @@
 ---
-title: 刷题-part0-梳理框架
+title: Algorithm-part0-梳理框架
 author: Rayest
 date: 2023-12-06 19:04:00 +0800
 categories: [interview]
