@@ -425,3 +425,135 @@ print(getInterSectNode(list1, list2).val)
 ## 合并K个有序链表
 
 ## 等到二叉堆数据结构做到了，再回头来写
+
+## 反转链表
+
+解法：递归。假设只有两个结点，进行反转。再往上递归到第三个、四个结点反转。
+
+```python
+def reverse(head):
+    
+    if head or head.next:
+        return head
+    
+    last = reverse(head.next)
+    
+    head.next.next = head
+    head.next = None
+    
+    return last
+```
+
+## 反转前N个结点 链表
+
+解法：递归。和反转链表就一个区别，反转后head不是最后结点，还要连上未反转的部分。
+
+```python
+raw = None
+
+def reverseN(head, n):
+    global raw
+    
+    if n == 1:
+        
+        raw = head.next
+        return head
+    
+    last = reverseN(head.next, n - 1)
+    
+    head.next.next = head
+    head.next = raw
+    
+    return last
+    
+```
+
+## 反转部分链表
+
+给一个索引区间 [m, n]（索引从 1 开始），仅仅反转区间中的链表元素。
+解法：先反转前N个链表，然后用递归从第m个结点开始反转。
+
+```python
+def reverseBetween(head, left, right):
+    
+    # if left == 1:
+    
+    raw = None
+    
+    def reverseN(head, right):
+        
+        if right == 1:
+            raw = head.next
+            return head
+        
+        last = reverseN(head.next, right - 1)
+        
+        head.next.next = head
+        head.next = raw
+        
+        return last
+        
+    if left == 1:
+        return reverseN(head, right)
+    
+    head.next = reverseBetween(head.next, left-1, right-1)
+    
+    return head
+        
+
+```
+
+## 链表中 k个一组进行反转
+
+解法：纯递归
+
+```python
+def reverseKGroup(head, k):
+    """
+    :type head: ListNode
+    :type k: int
+    :rtype: ListNode
+    """
+
+    def reverseBetween(head, left, right):
+
+        raw = None
+
+        def reverseN(head, right):
+            global raw
+
+            if right == 1:
+                raw = head.next
+                return head
+
+            last = reverseN(head.next, right - 1)
+
+            head.next.next = head
+            head.next = raw
+
+            return last
+
+        if left == 1:
+            return reverseN(head, right)
+
+        head.next = reverseBetween(head.next, left-1, right-1)
+
+        return head
+
+    tmp = head
+    left = 1
+    flag = True
+    while tmp:
+        for i in range(k):
+            if tmp is None:
+                flag = False
+                break
+            tmp = tmp.next
+
+        if flag:
+            head = reverseBetween(head, left, left+k-1)
+            left += k
+
+    return head
+
+```
