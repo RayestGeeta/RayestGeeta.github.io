@@ -218,3 +218,42 @@ class Solution(object):
         return res_max
                 
 ```
+
+## 优势洗牌
+
+给定两个长度相等的数组 nums1 和 nums2，nums1 相对于 nums2 的优势可以用满足 nums1[i] > nums2[i] 的索引 i 的数目来描述。
+返回 nums1 的任意排列，使其相对于 nums2 的优势最大化。
+
+```python
+class Solution(object):
+    def advantageCount(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: List[int]
+        """
+
+        # 和对面最大的值比，比得过就打，比不过就拿最小值顶
+
+        index1, index2 = [i for i in range(len(nums1))], [i for i in range(len(nums2))]
+
+        index1.sort(key = lambda x:nums1[x], reverse=True)
+        index2.sort(key = lambda x:nums2[x], reverse=True)
+
+
+        res = [0] * len(nums1)
+        left, right = 0, len(nums1) - 1
+        for i in range(len(nums1)):
+
+            if nums2[index2[i]] < nums1[index1[left]]:
+
+                res[index2[i]] = nums1[index1[left]]
+                left += 1
+
+
+            else:
+                res[index2[i]] = nums1[index1[right]]
+                right -= 1
+                
+        return res
+```
