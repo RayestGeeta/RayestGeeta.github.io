@@ -1,7 +1,7 @@
 ---
 title: Algorithm-part5-二叉树
 author: Rayest
-date: 2023-12-09 22:57:00 +0800
+date: 2023-12-14 22:57:00 +0800
 categories: [interview]
 tags: [fuck-code]
 math: true
