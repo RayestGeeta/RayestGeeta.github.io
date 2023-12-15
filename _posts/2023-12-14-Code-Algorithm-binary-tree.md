@@ -452,3 +452,302 @@ class Solution(object):
 <https://leetcode.cn/problems/count-of-smaller-numbers-after-self/description/>
 <https://leetcode.cn/problems/reverse-pairs/>
 <https://leetcode.cn/problems/count-of-range-sum/>
+
+## 二叉搜索树中第k小的元素
+
+解法：中序遍历。bst的中序遍历是顺序遍历。
+
+```python
+class Solution(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        
+        res = 0
+        count = 0
+
+        def traverse(root):
+            
+            global count
+            global res
+            
+            if not root:
+                return
+            traverse(root.left)
+            count += 1
+
+            if count == k:
+                res = root.val
+                return
+            traverse(root.right)
+
+            return
+
+        traverse(root)
+```
+
+## 把二叉搜索树转换为累加树
+
+给出二叉 搜索 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
+
+解法：中序遍历。逆中序遍历，累加最大值。
+
+```python
+class Solution(object):
+    def convertBST(self, root):
+        """
+        :type root: TreeNode
+        :rtype: TreeNode
+        """
+        
+        self.sum = 0
+
+        def traverse(root):
+            
+            
+            if not root:
+                return 0
+
+            traverse(root.right)
+
+            self.sum += root.val
+            root.val = self.sum
+            traverse(root.left)
+
+            return 0
+
+        traverse(root)
+
+        return root
+```
+
+## 验证二叉搜索树
+
+给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
+
+解法：首先要确定的是。root节点要大于所有的左子树，要小于所有的右子树。而不只是和自己左右节点对比。
+
+```python
+class Solution(object):
+    def isValidBST(self, root):
+        def isValidBSTHelper(root, min_node, max_node):
+            # base case
+            if not root:
+                return True
+            # 限定以 root 为根的子树节点必须满足 max.val > root.val > min.val
+            if min_node and root.val <= min_node.val:
+                return False
+            if max_node and root.val >= max_node.val:
+                return False
+            # 限定左子树的最大值是 root.val，右子树的最小值是 root.val
+            return (isValidBSTHelper(root.left, min_node, root) 
+                    and isValidBSTHelper(root.right, root, max_node))
+        
+        return isValidBSTHelper(root, None, None)
+```
+
+## 二叉搜索树中的搜索
+
+解法：利用bst左小右大的特性。root.val > val就往左子树找，反之往右找。
+
+```python
+class Solution(object):
+    def searchBST(self, root, val):
+        """
+        :type root: TreeNode
+        :type val: int
+        :rtype: TreeNode
+        """
+        if not root:
+            return None
+
+        if root.val > val:
+            return self.searchBST(root.left, val)
+
+        if root.val < val: 
+            return self.searchBST(root.right, val)
+
+        return root
+
+```
+
+## 二叉搜索树中的插入操作
+
+解法：一旦涉及「改」，就类似二叉树的构造问题，函数要返回 TreeNode 类型，并且要对递归调用的返回值进行接收。
+
+```python
+class Solution(object):
+    def insertIntoBST(self, root, val):
+        """
+        :type root: TreeNode
+        :type val: int
+        :rtype: TreeNode
+        """
+
+        if not root:
+            return TreeNode(val)
+
+        if root.val > val:
+            root.left = self.insertIntoBST(root.left, val)
+        else:
+            root.right = self.insertIntoBST(root.right, val)
+
+        return root
+```
+
+## 删除二叉搜索树中的节点
+
+解法：存在三种情况
+
+1. 末端节点：直接为None
+2. 剩余一个子节点：直接replace即可
+3. 存在两个子节点以上：找到右子树的最小节点replace。先删除掉这个最小节点。然后更改该最小节点的左右节点为replace的左右节点。最后再replace。
+
+```python
+class Solution(object):
+    def deleteNode(self, root, key):
+        """
+        :type root: TreeNode
+        :type key: int
+        :rtype: TreeNode
+        """
+
+        if not root:
+            return None
+
+        if root.val == key:
+            if root.left is None:
+                return root.right
+            if root.right is None:
+                return root.left
+
+            min_right_node = self.getMin(root.right)
+
+            root.right = self.deleteNode(root.right, min_right_node.val)
+
+            min_right_node.left = root.left
+            min_right_node.right = root.right
+            root = min_right_node
+
+        if root.val > key:
+            root.left = self.deleteNode(root.left, key)
+
+        if root.val < key:
+            root.right = self.deleteNode(root.right, key)
+
+        return root
+
+    def getMin(self, root):
+        while root.left:
+            root = root.left
+
+        return root
+```
+
+## 不同的二叉搜索树
+
+解法：每个节点都可以作为root。然后递归的使用[1, i-1]作为左子树，[i+1,n]作为右子树。res += left * righ。可以使用备忘录优化效率。
+
+```python
+class Solution(object):
+    def numTrees(self, n):
+        
+        self.memo = [[0 for i in range(n+1)] for j in range(n+1)]
+        
+        return self.count(1, n)
+
+    def count(self, lo, hi):
+        
+        if lo > hi: 
+            return 1
+        
+        if self.memo[lo][hi] != 0:
+            return self.memo[lo][hi]
+        
+        res = 0
+        for mid in range(lo, hi+1):
+            left = self.count(lo, mid - 1)
+            right = self.count(mid + 1, hi)
+            res += left * right
+        
+        self.memo[lo][hi] = res
+        
+        return res
+```
+
+## 不同的二叉搜索树 II
+
+给你一个整数 n ，请你生成并返回所有由 n 个节点组成且节点值从 1 到 n 互不相同的不同 二叉搜索树 。可以按 任意顺序 返回答案。
+
+解法：每个节点都可以作为root。然后递归的使用[1, i-1]作为左子树，[i+1,n]作为右子树。然后穷举所有情况保存下来。
+
+```python
+class Solution(object):
+    def generateTrees(self, n):
+        """
+        :type n: int
+        :rtype: List[TreeNode]
+        """
+        
+        if n == 0:
+            return []
+
+        return self.build(1, n)
+
+    
+    def build(self, l, r):
+
+        res = []
+        if l > r:
+            res.append(None)
+            return res
+
+        for i in range(l, r+1):
+            lefts = self.build(l, i-1)
+            rights = self.build(i+1, r)
+
+            for left in lefts:
+                for right in rights:
+                    root = TreeNode(i)
+                    root.left = left
+                    root.right = right
+                    res.append(root)
+
+        return res
+```
+
+## 完全二叉树的节点个数
+
+解法：判断是否是一个满二叉树(左右子树深度一样高)，直接返回2*depth - 1。如果不是，则走1 + count(root.left) + count(root.right)
+
+```python
+class Solution(object):
+    def countNodes(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        
+        if not root:
+            return 0
+
+        l = root
+        r = root
+        hl, hr = 0, 0
+
+        while l:
+            hl += 1
+            l = l.left
+
+        while r:
+            hr += 1
+            r = r.right
+
+        if hl == hr:
+            return pow(2, hl) - 1
+
+        return 1 + self.countNodes(root.left) + self.countNodes(root.right)
+```
