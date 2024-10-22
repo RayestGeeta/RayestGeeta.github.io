@@ -97,9 +97,9 @@ comments:
   # Giscus options › https://giscus.app
   giscus:
     repo: RayestGeeta/RayestGeeta.github.io
-    repo_id: R_kgDOJOPsBA
+    repo_id: R_kgDOJQg_pQ
     category: Announcements
-    category_id: DIC_kwDOJOPsBM4CVKLc
+    category_id: DIC_kwDOJQg_pc4CjlED
     mapping: # optional, default to 'pathname'
     input_position: top # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
