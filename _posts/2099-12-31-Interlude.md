@@ -1,7 +1,7 @@
 ---
 title: 生活的小插曲
 author: Rayest
-date: 2025-12-32 00:35:00 +0800
+date: 2025-12-31 00:35:00 +0800
 categories: [Interlude]
 tags: [Life]
 math: true
