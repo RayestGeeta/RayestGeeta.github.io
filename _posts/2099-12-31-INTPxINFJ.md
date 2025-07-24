@@ -10,6 +10,11 @@ math: true
 > *记录INTP女 x INFJ男 有意思的对话日常*
 {: .prompt-tip }
 
+1. 不给你抄
+
+- intp:
+- infj:
+
 写绩效，不给你抄。可以抄我的。
 
 期待你的期待
